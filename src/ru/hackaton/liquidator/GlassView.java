@@ -2,18 +2,22 @@ package ru.hackaton.liquidator;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.view.View;
+import android.util.AttributeSet;
+import android.widget.ImageView;
 
-public class GlassView extends View {
-    private Paint paint;
+public class GlassView extends ImageView {
     private Glass glass;
 
     public GlassView(Context context) {
         super(context);
-        paint = new Paint();
-        paint.setColor(Color.WHITE);
+    }
+
+    public GlassView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public GlassView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     public void setGlass(Glass glass) {
@@ -31,6 +35,7 @@ public class GlassView extends View {
             System.out.println("GlassView.onDraw");
             return;
         }
-        canvas.drawText(glass.getPercent() + "%, " + glass.getState(), 100, 100, paint);
+        getBackground().setLevel(glass.getPercent() * 10000 / 100);
+//        canvas.drawText(glass.getPercent() + "%, " + glass.getState(), 100, 100, paint);
     }
 }

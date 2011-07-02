@@ -23,10 +23,10 @@ public class GlassViewTestActivity extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_glass);
         glass = new Glass(250, 50);
-        glassView = new GlassView(this);
+        glassView = (GlassView) findViewById(R.id.id_glass);
         glassView.setGlass(glass);
-        setContentView(glassView);
     }
 
     @Override
