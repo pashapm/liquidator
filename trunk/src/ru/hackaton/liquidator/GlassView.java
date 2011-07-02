@@ -36,6 +36,5 @@ public class GlassView extends ImageView {
             return;
         }
         getBackground().setLevel(glass.getPercent() * 10000 / 100);
-//        canvas.drawText(glass.getPercent() + "%, " + glass.getState(), 100, 100, paint);
     }
 }
