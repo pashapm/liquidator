@@ -9,68 +9,57 @@ import android.graphics.Path;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class Bottle extends Activity {
 	
 	SimpleBottleView mView;
+	SeekBar mAngleSeeker;
+	SeekBar mVolumeSeeker;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mView = new SimpleBottleView(this);
-        setContentView(mView);
+        
+        setContentView(R.layout.bottle);
+        mView = (SimpleBottleView) findViewById(R.id.bottle);
+        mAngleSeeker = (SeekBar) findViewById(R.id.seekBar1);
+        mAngleSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				mView.setAnglePercent(progress);
+			}
+		});
+        
+        mVolumeSeeker = (SeekBar) findViewById(R.id.seekBar2);
+        mVolumeSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				mView.setVolumePercent(progress);
+			}
+		});
     }
     
-    class SimpleBottleView extends View  {
-
-    	float OFFSET_X = 50;
-    	float OFFSET_Y = 50;
-    	
-    	float mFull = 60000;
-    	float mVolume = 40000;
-    	double mAngle = 2 * Math.PI / 3;
-    	
-    	float mWidth = 200;
-    	float mHeight = 300;
-    	
-    	double ab[] = getAB();
-    	
-    	Paint mPaint = new Paint();
-    	
-		public SimpleBottleView(Context context) {
-			super(context);
-			Log.d("!!!", getAB()[0] +  "        " + getAB()[1]);
-			Log.d("VOLUME: ", (ab[0]*ab[1] / mWidth) + "");
-		}
-		
-		@Override
-		public void draw(Canvas canvas) {
-			super.draw(canvas);
-			mPaint.setColor(Color.WHITE);
-			canvas.drawRect(OFFSET_X, OFFSET_Y, mWidth + OFFSET_X, mHeight + OFFSET_Y, mPaint);
-			mPaint.setColor(Color.BLUE);
-			Path p = new Path();
-			
-			p.setLastPoint(mWidth + OFFSET_X, mHeight + OFFSET_Y);
-			p.lineTo(OFFSET_X, (float) (mHeight + OFFSET_Y));
-			p.lineTo(OFFSET_X, (float) (mHeight + OFFSET_Y - ab[0]));
-			p.lineTo(mWidth + OFFSET_X, (float) (mHeight + OFFSET_Y - ab[1]));
-			p.close();
-			canvas.drawPath(p, mPaint);
-		}
-		
-		double[] getAB() {  
-//			double Q = mWidth / Math.tan(mAngle);
-//			double Z = 2*mVolume / mWidth;
-//			double a = (-Q + Math.sqrt(Q*Q + 4*Z)) / 2;
-//			double b = a - Q;
-//			return new double[] {a, b};
-			
-			double b = mVolume / mWidth + mWidth / (Math.tan(mAngle) * 2);
-			double a = b - mWidth / Math.tan(mAngle);
-			return new double[] {b, a};
-			
-		} 
-    	
-    }
+    
 }
