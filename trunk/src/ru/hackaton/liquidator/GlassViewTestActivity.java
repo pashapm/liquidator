@@ -15,17 +15,17 @@ public class GlassViewTestActivity extends Activity {
     private Handler uiHandler = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
-            glass.add(10);
+            glass.add(1);
             glassView.invalidate();
-            sendEmptyMessageDelayed(MSG_DEFAULT, 500);
+            sendEmptyMessageDelayed(MSG_DEFAULT, 64);
         }
     };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_glass);
+        setContentView(R.layout.layout_vodka);
         glass = new Glass(250, 50);
-        glassView = (GlassView) findViewById(R.id.id_glass);
+        glassView = (GlassView) findViewById(R.id.id_vodka);
         glassView.setGlass(glass);
     }
 
