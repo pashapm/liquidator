@@ -1,31 +1,39 @@
 package ru.hackaton.liquidator;
 
 public class Glass {
-    public static final int THRESHOLD = 5;//percents
+    public static final int THRESHOLD = 5;//percents of required capacity
 
     private int requiredCapacity;//percents
     private int maxCapacity;//absolute
     private int currentCapacity;//absolute
 
+    private int maxError;//absolute
+
+    public Glass(int maxCapacity, int requiredCapacity) {
+        this.requiredCapacity = requiredCapacity;
+        this.maxCapacity = maxCapacity;
+        maxError = THRESHOLD * requiredCapacity / 100;
+    }
+
     /*
-        [0,requiredCapacity-THRESHOLD)
-     */
+       [0,requiredCapacity-THRESHOLD)
+    */
     public static final int STATE_MORE = 0;
 
     /*
        [requiredCapacity-THRESHOLD, requiredCapacity+THRESHOLD]
     */
-    public static final int STATE_OK = 0;
+    public static final int STATE_OK = 1;
 
     /*
        (requiredCapacity+THRESHOLD, 100]
     */
-    public static final int STATE_TOO_MUCH = 0;
+    public static final int STATE_TOO_MUCH = 2;
 
     /*
        (100, inf)
     */
-    public static final int STATE_OVERFLOW = 0;
+    public static final int STATE_OVERFLOW = 3;
 
 
     public static final Object lockObject = new Object();
@@ -36,20 +44,25 @@ public class Glass {
         }
     }
 
+    public int getAmount() {
+        synchronized (lockObject) {
+            return currentCapacity;
+        }
+    }
+
     public int getPercent() {
         synchronized (lockObject) {
-            return currentCapacity / maxCapacity;
+            return 100 * currentCapacity / maxCapacity;
         }
     }
 
     public int getState() {
         synchronized (lockObject) {
-            int currentPercents = currentCapacity / maxCapacity;
-            if (currentPercents < requiredCapacity - THRESHOLD) {
+            if (currentCapacity < requiredCapacity - maxError) {
                 return STATE_MORE;
-            } else if (currentPercents <= requiredCapacity - THRESHOLD) {
+            } else if (currentCapacity <= requiredCapacity + maxError) {
                 return STATE_OK;
-            } else if (currentPercents < 100) {
+            } else if (currentCapacity <= maxCapacity) {
                 return STATE_TOO_MUCH;
             } else {
                 return STATE_OVERFLOW;
