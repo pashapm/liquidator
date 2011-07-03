@@ -89,8 +89,8 @@ public class BluetoothActivity extends Activity {
         mView.mBulkListener = new SimpleBottleView.OnBulkListener() {
 			
 			@Override
-			public void bulk(int val) {
-				sendXY(new int[] {val, 0});
+			public void bulk(int val, int val2) {
+				sendXY(new int[] {val, val2});
 			}
 		};
         

@@ -37,6 +37,8 @@ public class SimpleBottleView extends View implements SensorEventListener {
 	
 	Point mBottleneck;
 	
+	protected int percent = 0;
+	
 	boolean mPouring = false;
 	
 	private SensorManager mSensorManager;
@@ -196,6 +198,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
 	
 	long lastReduce = 0;
 	
+	
 	void reduceVolume() {
 		float quant = MAX_VOLUME / 20;
 		if (System.currentTimeMillis() - lastReduce > 400 && mVolume >= quant) {
@@ -203,7 +206,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
 			mLiquidPath = getLiquidForm(neg ? -mAngle : mAngle);
 			((BluetoothActivity)getContext()).playBottle();
 			if (mBulkListener != null) {
-				mBulkListener.bulk((int) mVolume);
+				mBulkListener.bulk((int)mAngle, percent);
 			}
 			lastReduce = System.currentTimeMillis();
 			invalidate();
@@ -239,6 +242,6 @@ public class SimpleBottleView extends View implements SensorEventListener {
     }
     
     public interface OnBulkListener {
-    	void bulk(int val);
+    	void bulk(int val, int val2);
     }
 }
