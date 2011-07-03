@@ -3,6 +3,9 @@ package ru.hackaton.liquidator;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.view.View;
 
 public class GlassServerActivity extends Activity {
@@ -24,28 +27,40 @@ public class GlassServerActivity extends Activity {
         glassView1 = ((GlassView2) findViewById(R.id.glass1));
         glassView2 = ((GlassView2) findViewById(R.id.glass2));
         glassView3 = ((GlassView2) findViewById(R.id.glass3));
+
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                addItem(5, 360);
+                SystemClock.sleep(16);
+                sendEmptyMessage(0);
+            }
+        };
+
+        handler.sendEmptyMessage(0);
+
     }
 
-    private void addItem(int angle, final int position) {
+    private void addItem(final int angle, final int position) {
         View rootView = findViewById(android.R.id.content);
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                int position1 = position - glassView1.getLeft();
-                glassView1.setWaterPosition(position1);
-                int position2 = position - glassView2.getLeft();
-                glassView2.setWaterPosition(position2);
-                int position3 = position - glassView3.getLeft();
-                glassView3.setWaterPosition(position3);
+                updateView(glassView1, position, angle);
+                updateView(glassView2, position, angle);
+                updateView(glassView3, position, angle);
             }
         });
     }
 
     private void updateView(GlassView2 glassView, int position, int angle) {
-        glassView.setWaterPosition(position - glassView.getLeft());
-        if (glassView.getLeft() >= position && glassView.getRight() <= position) {
-            glassView.getGlass().add(angle * 10);
+        int left = glassView.getLeft();
+        int right = glassView.getRight();
+        glassView.setWaterPositionAndWidth(position - left, angle);
+        if (left <= position && position <= right) {
+            glassView.getGlass().add((int) (angle * 1.5));
         }
+        glassView.invalidate();
     }
 
 }
