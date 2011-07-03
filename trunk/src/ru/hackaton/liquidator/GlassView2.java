@@ -9,6 +9,7 @@ import android.view.View;
 public class GlassView2 extends View {
     private Glass glass = new Glass(250, 50);
     private int waterPosition;
+    private int angle;
 
     private Bitmap cupBitmap;
     private Bitmap emptyBitmap;
@@ -38,7 +39,6 @@ public class GlassView2 extends View {
         glassBitmap = BitmapFactory.decodeResource(resources, R.drawable.glass);
         waterBitmap = BitmapFactory.decodeResource(resources, R.drawable.water);
         waterMaskBitmap = BitmapFactory.decodeResource(resources, R.drawable.water_mask);
-        glass.add(125);
     }
 
     @Override
@@ -72,7 +72,8 @@ public class GlassView2 extends View {
         Rect ovalRect = getOvalRect();
         int top = ovalRect.centerY() - waterBitmap.getHeight() + 55;
         canvas.save();
-        float scale = 0.25f;
+        float scale = (float) Math.sin(Math.toRadians(angle));
+        scale = Math.max(scale, 0.125f);
         canvas.scale(scale, 1f);
         canvas.drawBitmap(waterBitmap, (waterPosition - 10) / scale, top, null);
         canvas.restore();
@@ -124,8 +125,9 @@ public class GlassView2 extends View {
         return new Rect(dy, top, dy + width, top + fillHeight * 2);
     }
 
-    public void setWaterPosition(int waterPosition) {
+    public void setWaterPositionAndWidth(int waterPosition, int angle) {
         this.waterPosition = waterPosition;
+        this.angle = angle;
         invalidate();
     }
 }

@@ -40,6 +40,7 @@ public class Glass {
 
     public void add(int amount) {
         synchronized (lockObject) {
+            if (currentCapacity >=maxCapacity) return;
             currentCapacity += amount;
         }
     }
