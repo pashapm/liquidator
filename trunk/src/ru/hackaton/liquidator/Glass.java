@@ -50,6 +50,12 @@ public class Glass {
         }
     }
 
+    public int getMaxCapacity() {
+        synchronized (lockObject) {
+            return maxCapacity;
+        }
+    }
+
     public int getPercent() {
         synchronized (lockObject) {
             return 100 * currentCapacity / maxCapacity;
