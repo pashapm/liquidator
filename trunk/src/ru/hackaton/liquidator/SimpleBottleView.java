@@ -74,6 +74,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		mMetersToPixelsX = mXDpi / 0.0254f;
 		mMetersToPixelsY = mYDpi / 0.0254f;
 		
+		mPaint.setAntiAlias(true);
 		mBottle = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.vodka);
 	}
 	
@@ -200,9 +201,9 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		if (System.currentTimeMillis() - lastReduce > 400 && mVolume >= quant) {
 			mVolume-=quant;
 			mLiquidPath = getLiquidForm(neg ? -mAngle : mAngle);
-			((Bottle)getContext()).playBottle();
+			((BluetoothActivity)getContext()).playBottle();
 			if (mBulkListener != null) {
-				mBulkListener.bulk();
+				mBulkListener.bulk((int) mVolume);
 			}
 			lastReduce = System.currentTimeMillis();
 			invalidate();
@@ -237,7 +238,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
         mSensorManager.unregisterListener(this);
     }
     
-    interface OnBulkListener {
-    	void bulk();
+    public interface OnBulkListener {
+    	void bulk(int val);
     }
 }
