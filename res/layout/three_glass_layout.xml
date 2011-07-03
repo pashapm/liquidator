@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:background="@drawable/main_bg2"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
 
-    <ru.hackaton.liquidator.GlassView android:id="@+id/glass1"
+    <ru.hackaton.liquidator.GlassView2 android:id="@+id/glass1"
                                       android:layout_margin="24dp"
                                       android:layout_gravity="bottom"
                                       android:src="@drawable/glass"
                                       android:layout_width="wrap_content"
                                       android:layout_height="wrap_content"/>
 
-    <ru.hackaton.liquidator.GlassView android:id="@+id/glass2"
+    <ru.hackaton.liquidator.GlassView2 android:id="@+id/glass2"
                                       android:layout_margin="24dp"
                                       android:layout_gravity="bottom"
                                       android:src="@drawable/glass"
                                       android:layout_width="wrap_content"
                                       android:layout_height="wrap_content"/>
 
-    <ru.hackaton.liquidator.GlassView android:id="@+id/glass3"
+    <ru.hackaton.liquidator.GlassView2 android:id="@+id/glass3"
                                       android:layout_margin="24dp"
                                       android:layout_gravity="bottom"
                                       android:src="@drawable/glass"

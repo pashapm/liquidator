@@ -58,7 +58,7 @@ public class Glass {
 
     public int getPercent() {
         synchronized (lockObject) {
-            return 100 * currentCapacity / maxCapacity;
+            return (int) (100 * 0.63 * currentCapacity / maxCapacity);//0.63 is a hack
         }
     }
 

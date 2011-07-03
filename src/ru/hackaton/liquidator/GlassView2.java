@@ -13,6 +13,7 @@ public class GlassView2 extends View {
     private Bitmap fillBitmap;
     private Bitmap glassBitmap;
     private Bitmap waterBitmap;
+    private Bitmap waterMaskBitmap;
 
     public GlassView2(Context context) {
         this(context, null);
@@ -30,7 +31,8 @@ public class GlassView2 extends View {
         fillBitmap = BitmapFactory.decodeResource(resources, R.drawable.glass_fill);
         glassBitmap = BitmapFactory.decodeResource(resources, R.drawable.glass);
         waterBitmap = BitmapFactory.decodeResource(resources, R.drawable.water);
-        glass.add(10);
+        waterMaskBitmap = BitmapFactory.decodeResource(resources, R.drawable.water_mask);
+        glass.add(125);
     }
 
     @Override
@@ -63,10 +65,14 @@ public class GlassView2 extends View {
 
         Rect ovalRect = getOvalRect();
         int top = ovalRect.centerY() - waterBitmap.getHeight() + 55;
-        canvas.drawBitmap(waterBitmap, 18, top, null);
+        canvas.save();
+        float scale = 0.25f;
+        canvas.scale(scale, 1f);
+        canvas.drawBitmap(waterBitmap, (80 - 10) / scale, top, null);
+        canvas.restore();
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawBitmap(fillBitmap, 0, 0, paint);
+        canvas.drawBitmap(waterMaskBitmap, 0, 0, paint);
 
         canvas.restoreToCount(sc);
 
