@@ -59,6 +59,7 @@ public class BluetoothActivity extends Activity {
 
     SimpleBottleView mView;
     SeekBar mVolumeSeeker;
+    SeekBar mSeeker2;
 
     int bottleId;
     SoundPool mSounds;
@@ -222,11 +223,32 @@ public class BluetoothActivity extends Activity {
                                     @Override
                                     public void onProgressChanged(SeekBar seekBar, int progress,
                                                                   boolean fromUser) {
-                                        mView.setVolumePercent(progress);
-                                        p1 = progress;
-                                        sendXY(new int[]{(int) mView.mAngle, p1});
+//                                        mView.setVolumePercent(progress);
+//                                        p1 = progress;
+//                                        sendXY(new int[]{(int) mView.mAngle, p1});
                                     }
                                 });
+                                
+                                mSeeker2 = (SeekBar) findViewById(R.id.seekBar2);
+                                mSeeker2.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+                                    @Override
+                                    public void onStopTrackingTouch(SeekBar seekBar) {
+                                    }
+
+                                    @Override
+                                    public void onStartTrackingTouch(SeekBar seekBar) {
+                                    }
+
+                                    @Override
+                                    public void onProgressChanged(SeekBar seekBar, int progress,
+                                                                  boolean fromUser) {
+                                        mView.setVolumePercent(progress);
+                                        p1 = progress;
+                                        sendXY(new int[]{(int) mView.mAngle*100, p1});
+                                    }
+                                });
+
                             }
                             break;
                         case BluetoothService.STATE_CONNECTING:
