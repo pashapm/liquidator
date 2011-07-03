@@ -35,7 +35,8 @@ public class SimpleBottleView extends View implements SensorEventListener {
 	
 	Point mBottleneck;
 	
-
+	boolean mPouring = false;
+	
 	private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
@@ -124,6 +125,8 @@ public class SimpleBottleView extends View implements SensorEventListener {
 				
 				pour = true;
 				
+//				Log.d("BO_TR", a+"   "+b);
+				
 				p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 				p.lineTo(OFFSET_X, HEIGHT + OFFSET_Y);
 				p.lineTo(OFFSET_X, HEIGHT + OFFSET_Y - a);
@@ -136,7 +139,11 @@ public class SimpleBottleView extends View implements SensorEventListener {
 				 
 				 if (b >= WIDTH / 2) {
 					 pour = true;
+				 } else {
+					 pour = false;
 				 }
+				 
+//				 Log.d("TRI", a+"   "+b);
 				 
 				 p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 				 p.lineTo(OFFSET_X + WIDTH - b, HEIGHT + OFFSET_Y);
@@ -151,7 +158,10 @@ public class SimpleBottleView extends View implements SensorEventListener {
 			
 			if (a >= WIDTH / 2) {
 				 pour = true;
+			 }else {
+				 pour = false;
 			 }
+//			Log.d("UP_TR", a+"   "+b);
 			
 			p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 			p.lineTo(OFFSET_X + WIDTH - b, HEIGHT + OFFSET_Y);
@@ -162,16 +172,32 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		}
 	}
 	
+	void onStartPouring() {
+		((Bottle)getContext()).playBottle();
+	}
+	
+	void onStopPouring() {
+		((Bottle)getContext()).stopPlayingBottle();
+	}
+	
 	boolean isPouring() {
-		return neg && pour;
+		boolean pnow = neg && pour;
+		if (!mPouring && pnow) {
+			onStartPouring();
+			mPouring = true;
+		} else if (mPouring && !pnow) {
+			onStopPouring();
+			mPouring = false;
+		}
+		return pnow;
 	}
 	
     public void onSensorChanged(SensorEvent sensorEvent) {
         values = sensorEvent.values;
         double gr = values[1] / 9.81;  // 1 => -1
-        Log.d("RAW", values[1]+"");
+//        Log.d("RAW", values[1]+"");
         mAngle = gr * Math.PI / 2;
-        Log.d("ANGLE", mAngle+"");
+//        Log.d("ANGLE", mAngle+"");
         if (mAngle < 0) {
 			neg = true;
 			mLiquidPath = getLiquidForm(-mAngle);
