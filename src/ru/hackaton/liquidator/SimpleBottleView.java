@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -15,22 +16,30 @@ public class SimpleBottleView extends View  {
 	float OFFSET_X;
 	float OFFSET_Y;
 	
-	final float MAX_VOLUME = 60000;
-	float mVolume = 25000;
-	double mAngle = Math.PI / 8 ;
-	
-	final float WIDTH = 200;
+	final float WIDTH = 100;
 	final float HEIGHT = 300;
+	
+	final float MAX_VOLUME = WIDTH * HEIGHT;
+	float mVolume = 0;
+	double mAngle = Math.PI / 8 ;
 	
 	Path mLiquidPath;
 	Paint mPaint = new Paint();
 	
 	boolean neg = false;
 	
+	Point mBottleneck;
+	
+//	public OnPouringListener mListener;
+	
 	public SimpleBottleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		OFFSET_X = (ScrProps.screenWidth - WIDTH) / 2;
 		OFFSET_Y = (ScrProps.screenHeight - HEIGHT) / 2;
+		
+		int bx = (int) (OFFSET_X + WIDTH/2);
+		int by = (int) OFFSET_Y;
+		mBottleneck = new Point(bx, by);
 	}
 	
 	@Override
@@ -49,6 +58,10 @@ public class SimpleBottleView extends View  {
 			} else {
 				canvas.drawPath(mLiquidPath, mPaint);
 			}
+		}
+		
+		if (isPouring()) {
+			canvas.drawCircle(10, 10, 10, mPaint);
 		}
 	}
 	
@@ -73,6 +86,8 @@ public class SimpleBottleView extends View  {
 		invalidate();
 	}
 	
+	boolean pour = false;
+	
 	Path getLiquidForm(double angle) {
 		float b = (float) (mVolume / WIDTH + WIDTH / (Math.tan(angle) * 2));
 		float a = (float) (b - WIDTH / Math.tan(angle));
@@ -80,6 +95,9 @@ public class SimpleBottleView extends View  {
 		
 		if (b <= HEIGHT) {
 			if (a >= 0) { //bottom trapecy
+				
+				pour = true;
+				
 				p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 				p.lineTo(OFFSET_X, HEIGHT + OFFSET_Y);
 				p.lineTo(OFFSET_X, HEIGHT + OFFSET_Y - a);
@@ -89,6 +107,11 @@ public class SimpleBottleView extends View  {
 			} else {  //  triangle
 				 a = (float) Math.sqrt(2 * mVolume / Math.tan(angle));
 				 b = (float) (a * Math.tan(angle));
+				 
+				 if (b >= WIDTH / 2) {
+					 pour = true;
+				 }
+				 
 				 p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 				 p.lineTo(OFFSET_X + WIDTH - b, HEIGHT + OFFSET_Y);
 				 p.lineTo(OFFSET_X + WIDTH, HEIGHT + OFFSET_Y - a);
@@ -99,6 +122,11 @@ public class SimpleBottleView extends View  {
 			double modAngle = Math.PI/2 - angle;
 			b = (float) (mVolume / HEIGHT + HEIGHT / (Math.tan(modAngle) * 2));
 			a = (float) (b - HEIGHT / Math.tan(modAngle));
+			
+			if (a >= WIDTH / 2) {
+				 pour = true;
+			 }
+			
 			p.setLastPoint(WIDTH + OFFSET_X, HEIGHT + OFFSET_Y);
 			p.lineTo(OFFSET_X + WIDTH - b, HEIGHT + OFFSET_Y);
 			p.lineTo(OFFSET_X + WIDTH - a, OFFSET_Y);
@@ -107,4 +135,12 @@ public class SimpleBottleView extends View  {
 			return p;
 		}
 	}
+	
+	boolean isPouring() {
+		return neg && pour;
+	}
+	
+//	public static interface OnPouringListener {
+//		void pour(int intensity);
+//	}
 }

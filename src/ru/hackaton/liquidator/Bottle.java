@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +27,10 @@ public class Bottle extends Activity {
         ScrProps.initialize(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bottle);
+        
+        SoundPool mSounds = new SoundPool(2, AudioManager.STREAM_MUSIC, 1);
+        int bottle = mSounds.load(this, R.raw.bottle, 1);
+        
         mView = (SimpleBottleView) findViewById(R.id.bottle);
         mAngleSeeker = (SeekBar) findViewById(R.id.seekBar1);
         mAngleSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
