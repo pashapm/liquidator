@@ -41,10 +41,9 @@ public class GlassView extends ImageView {
             return;
         }
         canvas.save();
-        int originalHeight = canvas.getHeight();
+
         float scale = 1.0f * glass.getMaxCapacity() / MAX_GLASS;
-        canvas.scale(scale, scale);
-        canvas.translate(0, originalHeight * (1 - scale));
+        canvas.scale(scale, scale, 0, canvas.getClipBounds().height());
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setFilterBitmap(false);
