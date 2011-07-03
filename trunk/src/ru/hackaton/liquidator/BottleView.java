@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public class BottleView extends View implements SensorEventListener {
         canvas.translate(START_OFFSET, START_OFFSET);
 
         float rawAngle = values[1];
-        float angle = -rawAngle * 9;
+        float angle = - rawAngle * 9;
         double radians = Math.toRadians(angle);
         float sin = (float) Math.sin(radians);
         canvas.drawLine(0, 0, 300, 300 * sin, paint);

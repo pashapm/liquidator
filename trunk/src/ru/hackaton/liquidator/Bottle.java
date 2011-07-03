@@ -21,6 +21,9 @@ public class Bottle extends Activity {
 	SeekBar mAngleSeeker;
 	SeekBar mVolumeSeeker;
 	
+	int bottleId;
+	SoundPool mSounds;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,8 +31,8 @@ public class Bottle extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.bottle);
         
-        SoundPool mSounds = new SoundPool(2, AudioManager.STREAM_MUSIC, 1);
-        int bottle = mSounds.load(this, R.raw.bottle, 1);
+        mSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 1);
+        bottleId = mSounds.load(this, R.raw.bottle, 1);
         
         mView = (SimpleBottleView) findViewById(R.id.bottle);
         mAngleSeeker = (SeekBar) findViewById(R.id.seekBar1);
@@ -79,6 +82,17 @@ public class Bottle extends Activity {
     protected void onPause() {
         super.onPause();
         mView.stopSimulation();
+    }
+    
+    void playBottle() {
+//    	mSounds.play(bottleId, 1, 1, 1, 1, 1);
+    	Log.d("Playing!!!!!!!!!!!", "play");
+    }
+    
+    void stopPlayingBottle() {
+//    	mSounds.stop(bottleId);
+//    	mSounds.setVolume(bottleId, 0, 0);
+    	Log.d("STOPPING!!!!!!!!!!!", "stop");
     }
     
     
