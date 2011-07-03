@@ -36,6 +36,7 @@ public class Bottle extends Activity {
         
         mView = (SimpleBottleView) findViewById(R.id.bottle);
         mAngleSeeker = (SeekBar) findViewById(R.id.seekBar1);
+        mAngleSeeker.setVisibility(View.GONE);
         mAngleSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
 			@Override
