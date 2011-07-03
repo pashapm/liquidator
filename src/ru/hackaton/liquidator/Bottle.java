@@ -32,7 +32,7 @@ public class Bottle extends Activity {
         setContentView(R.layout.bottle);
         
         mSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 1);
-        bottleId = mSounds.load(this, R.raw.bottle, 1);
+        bottleId = mSounds.load(this, R.raw.bulk, 1);
         
         mView = (SimpleBottleView) findViewById(R.id.bottle);
         mAngleSeeker = (SeekBar) findViewById(R.id.seekBar1);
@@ -85,8 +85,8 @@ public class Bottle extends Activity {
     }
     
     void playBottle() {
-//    	mSounds.play(bottleId, 1, 1, 1, 1, 1);
-    	Log.d("Playing!!!!!!!!!!!", "play");
+    	mSounds.play(bottleId, 1, 1, 1, 1, 1);
+//    	Log.d("Playing!!!!!!!!!!!", "play");
     }
     
     void stopPlayingBottle() {

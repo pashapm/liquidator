@@ -88,6 +88,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		}
 		
 		if (isPouring()) {
+			reduceVolume();
 			canvas.drawCircle(10, 10, 10, mPaint);
 		}
 	}
@@ -172,24 +173,23 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		}
 	}
 	
-	void onStartPouring() {
-		((Bottle)getContext()).playBottle();
-	}
-	
-	void onStopPouring() {
-		((Bottle)getContext()).stopPlayingBottle();
-	}
-	
 	boolean isPouring() {
 		boolean pnow = neg && pour;
-		if (!mPouring && pnow) {
-			onStartPouring();
-			mPouring = true;
-		} else if (mPouring && !pnow) {
-			onStopPouring();
-			mPouring = false;
-		}
 		return pnow;
+	}
+	
+	long lastReduce = 0;
+	
+	void reduceVolume() {
+		float quant = MAX_VOLUME / 20;
+		if (System.currentTimeMillis() - lastReduce > 400 && mVolume > quant) {
+			mVolume-=quant;
+			mLiquidPath = getLiquidForm(neg ? -mAngle : mAngle);
+			((Bottle)getContext()).playBottle();
+			lastReduce = System.currentTimeMillis();
+			invalidate();
+		}
+		
 	}
 	
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -210,7 +210,7 @@ public class SimpleBottleView extends View implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-    }
+    } 
 
     public void startSimulation() {
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
