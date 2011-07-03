@@ -5,11 +5,13 @@ import android.content.res.Resources;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 
-public class GlassView extends View {
+public class GlassView extends ImageView {
+    public static final int MAX_GLASS = 250;
+
     private Glass glass;
     private Bitmap fill;
-    private Bitmap src;
 
     public GlassView(Context context) {
         this(context, null);
@@ -23,8 +25,6 @@ public class GlassView extends View {
         super(context, attrs, defStyle);
         Resources resources = context.getResources();
         fill = BitmapFactory.decodeResource(resources, R.drawable.glass_fill);
-        src = BitmapFactory.decodeResource(resources, R.drawable.glass);
-
     }
 
     public void setGlass(Glass glass) {
@@ -37,7 +37,14 @@ public class GlassView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        if (glass == null) {
+            return;
+        }
+        canvas.save();
+        int originalHeight = canvas.getHeight();
+        float scale = 1.0f * glass.getMaxCapacity() / MAX_GLASS;
+        canvas.scale(scale, scale);
+        canvas.translate(0, originalHeight * (1 - scale));
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setFilterBitmap(false);
@@ -73,7 +80,7 @@ public class GlassView extends View {
 
         canvas.restoreToCount(sc);
 
-
-        canvas.drawBitmap(src, 0, 0, null);
+        super.onDraw(canvas);
+        canvas.restore();
     }
 }
