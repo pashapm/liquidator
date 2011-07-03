@@ -9,7 +9,7 @@ public class GlassServerActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        startGame();
-        setContentView(new GlassView2(this));
+        setContentView(R.layout.three_glass_layout);
     }
 
     private void startGame() {
