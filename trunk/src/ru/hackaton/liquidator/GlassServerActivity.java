@@ -28,17 +28,6 @@ public class GlassServerActivity extends Activity {
         glassView2 = ((GlassView2) findViewById(R.id.glass2));
         glassView3 = ((GlassView2) findViewById(R.id.glass3));
 
-        Handler handler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                addItem(5, 360);
-                SystemClock.sleep(16);
-                sendEmptyMessage(0);
-            }
-        };
-
-        handler.sendEmptyMessage(0);
-
     }
 
     private void addItem(final int angle, final int position) {
