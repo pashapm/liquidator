@@ -8,12 +8,18 @@ import android.view.View;
 
 public class GlassView2 extends View {
     private Glass glass = new Glass(250, 50);
+    private int waterPosition;
+
     private Bitmap cupBitmap;
     private Bitmap emptyBitmap;
     private Bitmap fillBitmap;
     private Bitmap glassBitmap;
     private Bitmap waterBitmap;
     private Bitmap waterMaskBitmap;
+
+    public Glass getGlass() {
+        return glass;
+    }
 
     public GlassView2(Context context) {
         this(context, null);
@@ -68,7 +74,7 @@ public class GlassView2 extends View {
         canvas.save();
         float scale = 0.25f;
         canvas.scale(scale, 1f);
-        canvas.drawBitmap(waterBitmap, (80 - 10) / scale, top, null);
+        canvas.drawBitmap(waterBitmap, (waterPosition - 10) / scale, top, null);
         canvas.restore();
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
@@ -118,4 +124,7 @@ public class GlassView2 extends View {
         return new Rect(dy, top, dy + width, top + fillHeight * 2);
     }
 
+    public void setWaterPosition(int waterPosition) {
+        this.waterPosition = waterPosition;
+    }
 }
