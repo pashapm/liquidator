@@ -50,7 +50,7 @@ public class Bottle extends Activity {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
 					boolean fromUser) {
-				mView.setAnglePercent(progress);
+				mView.percent = progress;
 			}
 		});
         
