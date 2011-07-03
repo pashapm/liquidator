@@ -8,7 +8,8 @@ public class GlassServerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startGame();
+//        startGame();
+        setContentView(new GlassView2(this));
     }
 
     private void startGame() {
