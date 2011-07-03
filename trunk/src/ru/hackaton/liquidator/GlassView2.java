@@ -126,5 +126,6 @@ public class GlassView2 extends View {
 
     public void setWaterPosition(int waterPosition) {
         this.waterPosition = waterPosition;
+        invalidate();
     }
 }
