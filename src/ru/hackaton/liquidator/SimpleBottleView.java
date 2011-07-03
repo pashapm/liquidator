@@ -1,6 +1,8 @@
 package ru.hackaton.liquidator;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -47,6 +49,10 @@ public class SimpleBottleView extends View implements SensorEventListener {
     private float[] values;
     private Paint paint;
     public static final int START_OFFSET = 30;
+    
+    OnBulkListener mBulkListener;
+    
+    Bitmap mBottle;
 	
 	public SimpleBottleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -67,14 +73,18 @@ public class SimpleBottleView extends View implements SensorEventListener {
 		mYDpi = metrics.ydpi;
 		mMetersToPixelsX = mXDpi / 0.0254f;
 		mMetersToPixelsY = mYDpi / 0.0254f;
+		
+		mBottle = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.vodka);
 	}
 	
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
+		canvas.drawColor(Color.WHITE);
 		mPaint.setColor(Color.WHITE);
 		canvas.drawRect(OFFSET_X, OFFSET_Y, WIDTH + OFFSET_X, HEIGHT + OFFSET_Y, mPaint);
 		mPaint.setColor(Color.BLUE);
+		canvas.save();
 		if (mLiquidPath != null) {
 			if (neg) {
 				Matrix m = new Matrix();
@@ -91,6 +101,11 @@ public class SimpleBottleView extends View implements SensorEventListener {
 			reduceVolume();
 			canvas.drawCircle(10, 10, 10, mPaint);
 		}
+		
+		canvas.restore();
+		
+		int x = ScrProps.screenWidth/2 - mBottle.getWidth()/2;
+		canvas.drawBitmap(mBottle, x, OFFSET_Y, mPaint);
 	}
 	
 	// 0 - 100
@@ -182,14 +197,16 @@ public class SimpleBottleView extends View implements SensorEventListener {
 	
 	void reduceVolume() {
 		float quant = MAX_VOLUME / 20;
-		if (System.currentTimeMillis() - lastReduce > 400 && mVolume > quant) {
+		if (System.currentTimeMillis() - lastReduce > 400 && mVolume >= quant) {
 			mVolume-=quant;
 			mLiquidPath = getLiquidForm(neg ? -mAngle : mAngle);
 			((Bottle)getContext()).playBottle();
+			if (mBulkListener != null) {
+				mBulkListener.bulk();
+			}
 			lastReduce = System.currentTimeMillis();
 			invalidate();
 		}
-		
 	}
 	
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -218,5 +235,9 @@ public class SimpleBottleView extends View implements SensorEventListener {
 
     public void stopSimulation() {
         mSensorManager.unregisterListener(this);
+    }
+    
+    interface OnBulkListener {
+    	void bulk();
     }
 }
