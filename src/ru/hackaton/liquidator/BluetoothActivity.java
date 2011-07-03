@@ -139,7 +139,7 @@ public class BluetoothActivity extends Activity {
     public synchronized void onPause() {
         super.onPause();
         if (D) Log.e(TAG, "- ON PAUSE -");
-        if (!CLIENT) mView.stopSimulation();
+//        if (!CLIENT) mView.stopSimulation();
     }
 
     @Override
@@ -177,6 +177,8 @@ public class BluetoothActivity extends Activity {
         mService.write(send);
     }
 
+    int p1;
+
     // The Handler that gets information back from the BluetoothService
     private final Handler mHandler = new Handler() {
         @Override
@@ -186,6 +188,8 @@ public class BluetoothActivity extends Activity {
                     if (D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
+                            final int[] angle = new int[1];
+                            int position;
                             Log.d("!!!!", getString(R.string.title_connected_to));
                             Log.d(">>>", mConnectedDeviceName);
                             if (CLIENT) {
@@ -194,11 +198,13 @@ public class BluetoothActivity extends Activity {
                                 setContentView(R.layout.bottle);
                                 mView = (SimpleBottleView) findViewById(R.id.bottle);
                                 mView.startSimulation();
+
                                 mView.mBulkListener = new SimpleBottleView.OnBulkListener() {
 
                                     @Override
                                     public void bulk(int val, int val2) {
-                                        sendXY(new int[]{val, val2});
+
+                                        sendXY(new int[]{(int) mView.mAngle, p1});
                                     }
                                 };
 
@@ -217,6 +223,8 @@ public class BluetoothActivity extends Activity {
                                     public void onProgressChanged(SeekBar seekBar, int progress,
                                                                   boolean fromUser) {
                                         mView.setVolumePercent(progress);
+                                        p1 = progress;
+                                        sendXY(new int[]{(int) mView.mAngle, p1});
                                     }
                                 });
                             }
@@ -299,7 +307,7 @@ public class BluetoothActivity extends Activity {
 
     private void startGame() {
         setContentView(R.layout.three_glass_layout);
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         glassView1 = ((GlassView2) findViewById(R.id.glass1));
         glassView2 = ((GlassView2) findViewById(R.id.glass2));
@@ -320,6 +328,8 @@ public class BluetoothActivity extends Activity {
     }
 
     private void updateView(GlassView2 glassView, int position, int angle) {
+        position = position * 800 / 100;
+        System.out.println("BluetoothActivity.addItem: " + angle + ", " + position);
         int left = glassView.getLeft();
         int right = glassView.getRight();
         glassView.setWaterPositionAndWidth(position - left, angle);
