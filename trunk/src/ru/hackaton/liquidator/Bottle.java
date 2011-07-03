@@ -69,5 +69,17 @@ public class Bottle extends Activity {
 		});
     }
     
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mView.startSimulation();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mView.stopSimulation();
+    }
+    
     
 }

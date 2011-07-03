@@ -7,11 +7,16 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
-public class SimpleBottleView extends View  {
+public class SimpleBottleView extends View implements SensorEventListener {
 
 	float OFFSET_X;
 	float OFFSET_Y;
@@ -30,7 +35,17 @@ public class SimpleBottleView extends View  {
 	
 	Point mBottleneck;
 	
-//	public OnPouringListener mListener;
+
+	private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+
+    private float mXDpi;
+    private float mYDpi;
+    private float mMetersToPixelsX;
+    private float mMetersToPixelsY;
+    private float[] values;
+    private Paint paint;
+    public static final int START_OFFSET = 30;
 	
 	public SimpleBottleView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -40,6 +55,17 @@ public class SimpleBottleView extends View  {
 		int bx = (int) (OFFSET_X + WIDTH/2);
 		int by = (int) OFFSET_Y;
 		mBottleneck = new Point(bx, by);
+		
+		mSensorManager = (SensorManager) context
+				.getSystemService(Context.SENSOR_SERVICE);
+		mAccelerometer = mSensorManager
+				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+		mXDpi = metrics.xdpi;
+		mYDpi = metrics.ydpi;
+		mMetersToPixelsX = mXDpi / 0.0254f;
+		mMetersToPixelsY = mYDpi / 0.0254f;
 	}
 	
 	@Override
@@ -140,7 +166,31 @@ public class SimpleBottleView extends View  {
 		return neg && pour;
 	}
 	
-//	public static interface OnPouringListener {
-//		void pour(int intensity);
-//	}
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        values = sensorEvent.values;
+        double gr = values[1] / 9.81;  // 1 => -1
+        Log.d("RAW", values[1]+"");
+        mAngle = gr * Math.PI / 2;
+        Log.d("ANGLE", mAngle+"");
+        if (mAngle < 0) {
+			neg = true;
+			mLiquidPath = getLiquidForm(-mAngle);
+		} else {
+			neg = false;
+			mLiquidPath = getLiquidForm(mAngle);
+		}
+        invalidate();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    public void startSimulation() {
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    public void stopSimulation() {
+        mSensorManager.unregisterListener(this);
+    }
 }
