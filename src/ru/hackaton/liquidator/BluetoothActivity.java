@@ -4,22 +4,26 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.Window;
+import android.view.*;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class BluetoothActivity extends Activity {
+
+    private GlassView2 glassView1;
+    private GlassView2 glassView2;
+    private GlassView2 glassView3;
+
+
     // Debugging
     private static final String TAG = "BluetoothActivity";
     private static final boolean D = true;
@@ -30,7 +34,7 @@ public class BluetoothActivity extends Activity {
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
- 
+
     // Key names received from the BluetoothService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
@@ -53,23 +57,21 @@ public class BluetoothActivity extends Activity {
 
     private static boolean CLIENT = false;
 
-	SimpleBottleView mView;
-	SeekBar mVolumeSeeker;
-	
-	int bottleId;
-	SoundPool mSounds;
+    SimpleBottleView mView;
+    SeekBar mVolumeSeeker;
+
+    int bottleId;
+    SoundPool mSounds;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	requestWindowFeature(Window.FEATURE_NO_TITLE);
-    	ScrProps.initialize(this);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        ScrProps.initialize(this);
         super.onCreate(savedInstanceState);
         if (D) Log.e(TAG, "+++ ON CREATE +++");
 
         // Set up the window layout
 //        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        setContentView(R.layout.bottle);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -80,37 +82,12 @@ public class BluetoothActivity extends Activity {
             finish();
             return;
         }
-        
-        
+
+
         mSounds = new SoundPool(1, AudioManager.STREAM_MUSIC, 1);
         bottleId = mSounds.load(this, R.raw.bulk, 1);
-        
-        mView = (SimpleBottleView) findViewById(R.id.bottle);
-        mView.mBulkListener = new SimpleBottleView.OnBulkListener() {
-			
-			@Override
-			public void bulk(int val, int val2) {
-				sendXY(new int[] {val, val2});
-			}
-		};
-        
-        mVolumeSeeker = (SeekBar) findViewById(R.id.seekBar2);
-        mVolumeSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-			
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				mView.setVolumePercent(progress);
-			}
-		});
+
+
     }
 
     @Override
@@ -132,8 +109,8 @@ public class BluetoothActivity extends Activity {
         Intent intent = getIntent();
         if (intent != null) {
             int type = intent.getIntExtra("type", -1);
-            if(type != -1) {
-               CLIENT = type == 1;
+            if (type != -1) {
+                CLIENT = type == 1;
             } else {
                 Log.e(TAG, "wtf???");
             }
@@ -152,18 +129,17 @@ public class BluetoothActivity extends Activity {
                 mService.start();
             }
         }
-        mView.startSimulation();
     }
 
     void playBottle() {
-    	mSounds.play(bottleId, 1, 1, 1, 1, 1);
+        mSounds.play(bottleId, 1, 1, 1, 1, 1);
     }
-    
+
     @Override
     public synchronized void onPause() {
         super.onPause();
         if (D) Log.e(TAG, "- ON PAUSE -");
-        mView.stopSimulation();
+        if (!CLIENT) mView.stopSimulation();
     }
 
     @Override
@@ -200,6 +176,7 @@ public class BluetoothActivity extends Activity {
         byte[] send = BluetoothService.int2byte(x_y);
         mService.write(send);
     }
+
     // The Handler that gets information back from the BluetoothService
     private final Handler mHandler = new Handler() {
         @Override
@@ -209,15 +186,47 @@ public class BluetoothActivity extends Activity {
                     if (D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
-                        	Log.d("!!!!", getString(R.string.title_connected_to));
-                        	Log.d(">>>", mConnectedDeviceName);
+                            Log.d("!!!!", getString(R.string.title_connected_to));
+                            Log.d(">>>", mConnectedDeviceName);
+                            if (CLIENT) {
+                                startGame();
+                            } else {
+                                setContentView(R.layout.bottle);
+                                mView = (SimpleBottleView) findViewById(R.id.bottle);
+                                mView.startSimulation();
+                                mView.mBulkListener = new SimpleBottleView.OnBulkListener() {
+
+                                    @Override
+                                    public void bulk(int val, int val2) {
+                                        sendXY(new int[]{val, val2});
+                                    }
+                                };
+
+                                mVolumeSeeker = (SeekBar) findViewById(R.id.seekBar2);
+                                mVolumeSeeker.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+                                    @Override
+                                    public void onStopTrackingTouch(SeekBar seekBar) {
+                                    }
+
+                                    @Override
+                                    public void onStartTrackingTouch(SeekBar seekBar) {
+                                    }
+
+                                    @Override
+                                    public void onProgressChanged(SeekBar seekBar, int progress,
+                                                                  boolean fromUser) {
+                                        mView.setVolumePercent(progress);
+                                    }
+                                });
+                            }
                             break;
                         case BluetoothService.STATE_CONNECTING:
-                        	Log.d("!!!!", getString(R.string.title_connecting));
+                            Log.d("!!!!", getString(R.string.title_connecting));
                             break;
                         case BluetoothService.STATE_LISTEN:
                         case BluetoothService.STATE_NONE:
-                        	Log.d("!!!!", getString(R.string.title_not_connected));
+                            Log.d("!!!!", getString(R.string.title_not_connected));
                             break;
                     }
                     break;
@@ -228,6 +237,7 @@ public class BluetoothActivity extends Activity {
                         byte[] readBuf = (byte[]) msg.obj;
                         int[] x_y = BluetoothService.byte2int(readBuf);
                         Log.i("result", mConnectedDeviceName + ":  " + x_y[0] + " " + x_y[1]);
+                        addItem(x_y[0], x_y[1]);
                     }
                     break;
                 case MESSAGE_DEVICE_NAME:
@@ -245,13 +255,13 @@ public class BluetoothActivity extends Activity {
     };
 
     public void getActivityResult(int requestCode, int resultCode, Intent data) {
-        if (D) Log.d(TAG, "requestCode: " + requestCode+", resultCode: "+resultCode+", data: "+data);
+        if (D) Log.d(TAG, "requestCode: " + requestCode + ", resultCode: " + resultCode + ", data: " + data);
         switch (requestCode) {
             case REQUEST_CONNECT_DEVICE:
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
 
-                    Log.d(TAG, ""+address);
+                    Log.d(TAG, "" + address);
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
                     mService.connect(device);
                 }
@@ -285,6 +295,38 @@ public class BluetoothActivity extends Activity {
                 return true;
         }
         return false;
+    }
+
+    private void startGame() {
+        setContentView(R.layout.three_glass_layout);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        glassView1 = ((GlassView2) findViewById(R.id.glass1));
+        glassView2 = ((GlassView2) findViewById(R.id.glass2));
+        glassView3 = ((GlassView2) findViewById(R.id.glass3));
+
+    }
+
+    private void addItem(final int angle, final int position) {
+        View rootView = findViewById(android.R.id.content);
+        rootView.post(new Runnable() {
+            @Override
+            public void run() {
+                updateView(glassView1, position, angle);
+                updateView(glassView2, position, angle);
+                updateView(glassView3, position, angle);
+            }
+        });
+    }
+
+    private void updateView(GlassView2 glassView, int position, int angle) {
+        int left = glassView.getLeft();
+        int right = glassView.getRight();
+        glassView.setWaterPositionAndWidth(position - left, angle);
+        if (left <= position && position <= right) {
+            glassView.getGlass().add((int) (angle * 1.5));
+        }
+        glassView.invalidate();
     }
 
 }
